@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                DateTimeX-Web
+version:             0.01
+abstract:            DateTime factory for web apps
+license:             perl
+author:              
+    - Kenichi Ishigaki <ishigaki@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DateTime:                      0
+    DateTime::Format::Mail:        0
+    DateTime::Format::MySQL:       0
+    DateTime::Format::Strptime:    0
+    DateTime::Format::W3CDTF:      0
+    DateTime::Locale:              0
+    DateTime::TimeZone:            0
+    Test::More:                    0.47
+    Test::UseAllModules:           0.09
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
