@@ -1,4 +1,8 @@
 Revision history for DateTimeX-Web
 
+0.02 2008/07/05
+  - slightly better error handling (no more misguiding isa errors)
+  - updated MANIFEST to add tests that were only in the repository
+
 0.01 2008/02/28
   - initial release

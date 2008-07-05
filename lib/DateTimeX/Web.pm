@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use DateTime;
 use DateTime::Locale;
@@ -61,9 +61,10 @@ sub time_zone {
   my ($self, $zone) = @_;
 
   if ( $zone ) {
-    $self->{config}->{time_zone} = $zone->isa('DateTime::TimeZone')
-      ? $zone
-      : DateTime::TimeZone->new( name => $zone );
+    $self->{config}->{time_zone} =
+      ( ref $zone && $zone->isa('DateTime::TimeZone') )
+        ? $zone
+        : DateTime::TimeZone->new( name => $zone );
   }
   $self->{config}->{time_zone};
 }
@@ -72,9 +73,10 @@ sub locale {
   my ($self, $locale) = @_;
 
   if ( $locale ) {
-    $self->{config}->{locale} = $locale->isa('DateTime::Locale::root')
-      ? $locale
-      : DateTime::Locale->load( $locale );
+    $self->{config}->{locale} =
+      ( ref $locale && $locale->isa('DateTime::Locale::root') ) 
+        ? $locale
+        : DateTime::Locale->load( $locale );
   }
   $self->{config}->{locale};
 }
@@ -90,7 +92,11 @@ sub now {
 }
 
 sub from {
-  my ($self, %options) = @_;
+  my $self = shift;
+
+  croak "Odd number of elements in hash assignment" if @_ % 2;
+
+  my %options = @_;
 
   return $self->from_epoch( %options ) if $options{epoch};
 
@@ -190,7 +196,7 @@ sub _datetime {
   my $self = shift;
 
   return $self->now unless @_;
-  return $_[0] if @_ == 1 && $_[0]->isa('DateTime');
+  return $_[0] if @_ == 1 && ref $_[0] && $_[0]->isa('DateTime');
   return $self->from( @_ );
 }
 

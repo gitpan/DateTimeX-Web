@@ -6,4 +6,14 @@ README
 t/00_load.t
 t/99_pod.t
 t/99_podcoverage.t
+t/basic.t
+t/constructor.t
+t/error.t
+t/format.t
+t/isa_errors.t
+t/lib/MyFormat.pm
+t/mail.t
+t/mysql.t
+t/strptime.t
+t/wwwc.t
 META.yml                                 Module meta-data (added by MakeMaker)

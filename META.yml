@@ -1,11 +1,11 @@
 --- #YAML:1.0
 name:                DateTimeX-Web
-version:             0.01
+version:             0.02
 abstract:            DateTime factory for web apps
 license:             perl
 author:              
     - Kenichi Ishigaki <ishigaki@cpan.org>
-generated_by:        ExtUtils::MakeMaker version 6.42
+generated_by:        ExtUtils::MakeMaker version 6.44
 distribution_type:   module
 requires:     
     DateTime:                      0
