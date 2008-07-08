@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                DateTimeX-Web
-version:             0.02
+version:             0.03
 abstract:            DateTime factory for web apps
 license:             perl
 author:              
@@ -15,6 +15,7 @@ requires:
     DateTime::Format::W3CDTF:      0
     DateTime::Locale:              0
     DateTime::TimeZone:            0
+    Scalar::Util:                  0
     Test::More:                    0.47
     Test::UseAllModules:           0.09
 meta-spec:

@@ -15,6 +15,7 @@ WriteMakefile(
     'DateTime::Format::Strptime' => 0,
     'DateTime::Locale'           => 0,
     'DateTime::TimeZone'         => 0,
+    'Scalar::Util'               => 0,
     'Test::More'                 => '0.47',
     'Test::UseAllModules'        => '0.09',
   },

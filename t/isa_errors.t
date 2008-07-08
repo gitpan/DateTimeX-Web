@@ -27,3 +27,37 @@ eval { $dtx->locale( 123456 ) };
 
 ok $@ =~ /Invalid /, $@;
 
+
+eval { $dtx->_datetime( { epoch => 123456 } ) };
+
+ok !$@; # As of 0.03, constructors get looser
+
+eval { $dtx->from( { epoch => 123456 } ) };
+
+ok !$@;  # As of 0.03, constructors get looser
+
+eval { $dtx->time_zone( { } ) };
+
+ok $@ =~ /not one of the allowed types/, $@;
+
+eval { $dtx->locale( { } ) };
+
+ok $@ =~ /not one of the allowed types/, $@;
+
+
+eval { $dtx->_datetime( [ epoch => 123456 ] ) };
+
+ok !$@;  # As of 0.03, constructors get looser
+
+eval { $dtx->from( [ epoch => 123456 ] ) };
+
+ok !$@;  # As of 0.03, constructors get looser
+
+eval { $dtx->time_zone( [ ] ) };
+
+ok $@ =~ /not one of the allowed types/, $@;
+
+eval { $dtx->locale( [ ] ) };
+
+ok $@ =~ /not one of the allowed types/, $@;
+

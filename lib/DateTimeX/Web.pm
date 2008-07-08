@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use DateTime;
 use DateTime::Locale;
@@ -13,11 +13,23 @@ use DateTime::Format::Strptime;
 use DateTime::Format::Mail;
 use DateTime::Format::W3CDTF;
 use DateTime::Format::MySQL;
+use Scalar::Util qw( blessed );
+
+sub _parse_options {
+  my $self = shift;
+
+  if ( @_ == 1 ) {
+    return %{$_[0]} if ref $_[0] eq 'HASH';
+    return @{$_[0]} if ref $_[0] eq 'ARRAY';
+  }
+  croak "Odd number of elements in hash assignment" if @_ % 2;
+  return @_;
+}
 
 sub new {
   my $class = shift;
 
-  my %config = ( @_ == 1 && ref $_[0] eq 'HASH' ) ? %{ $_[0] } : @_;
+  my %config = $class->_parse_options(@_);
 
   $config{on_error} ||= 'croak';
 
@@ -62,7 +74,7 @@ sub time_zone {
 
   if ( $zone ) {
     $self->{config}->{time_zone} =
-      ( ref $zone && $zone->isa('DateTime::TimeZone') )
+      ( blessed $zone && $zone->isa('DateTime::TimeZone') )
         ? $zone
         : DateTime::TimeZone->new( name => $zone );
   }
@@ -74,7 +86,7 @@ sub locale {
 
   if ( $locale ) {
     $self->{config}->{locale} =
-      ( ref $locale && $locale->isa('DateTime::Locale::root') ) 
+      ( blessed $locale && $locale->isa('DateTime::Locale::root') ) 
         ? $locale
         : DateTime::Locale->load( $locale );
   }
@@ -82,7 +94,9 @@ sub locale {
 }
 
 sub now {
-  my ($self, %options) = @_;
+  my $self = shift;
+
+  my %options = $self->_parse_options(@_);
 
   $self->_merge_config( \%options );
 
@@ -94,9 +108,7 @@ sub now {
 sub from {
   my $self = shift;
 
-  croak "Odd number of elements in hash assignment" if @_ % 2;
-
-  my %options = @_;
+  my %options = $self->_parse_options(@_);
 
   return $self->from_epoch( %options ) if $options{epoch};
 
@@ -111,7 +123,7 @@ sub from_epoch {
   my $self  = shift;
   my $epoch = shift;
      $epoch = shift if $epoch eq 'epoch';
-  my %options = @_;
+  my %options = $self->_parse_options(@_);
 
   $self->_merge_config( \%options );
 
@@ -125,10 +137,13 @@ sub from_rss   { shift->parse_as( wwwc  => @_ ); }
 sub from_mail  { shift->parse_as( mail  => @_ ); }
 sub from_mysql { shift->parse_as( mysql => @_ ); }
 
-*from_wwwc = \&from_rss;
+*from_wwwc  = \&from_rss;
+*from_rss20 = \&from_mail;
 
 sub parse_as {
-  my ($self, $formatter, $string, %options) = @_;
+  my ($self, $formatter, $string, @args) = @_;
+
+  my %options = $self->_parse_options(@args);
 
   $self->_load( $formatter );
 
@@ -144,7 +159,9 @@ sub parse_as {
 }
 
 sub parse {
-  my ($self, $pattern, $string, %options) = @_;
+  my ($self, $pattern, $string, @args) = @_;
+
+  my %options = $self->_parse_options(@args);
 
   unless ( $self->{parser}->{$pattern} ) {
     $self->_merge_config( \%options );
@@ -168,7 +185,8 @@ sub for_rss   { shift->render_as( wwwc  => @_ ); }
 sub for_mail  { shift->render_as( mail  => @_ ); }
 sub for_mysql { shift->render_as( mysql => @_ ); }
 
-*for_wwwc = \&for_rss;
+*for_wwwc  = \&for_rss;
+*for_rss20 = \&for_mail;
 
 sub render_as {
   my ($self, $formatter, @args) = @_;
@@ -196,7 +214,7 @@ sub _datetime {
   my $self = shift;
 
   return $self->now unless @_;
-  return $_[0] if @_ == 1 && ref $_[0] && $_[0]->isa('DateTime');
+  return $_[0] if @_ == 1 && blessed $_[0] && $_[0]->isa('DateTime');
   return $self->from( @_ );
 }
 
@@ -315,7 +333,7 @@ takes arguments for a DateTime constructor and returns a DateTime object. Also, 
 
 takes a W3CDTF (ISO 8601) datetime string used by RSS 1.0 etc, and returns a DateTime object.
 
-=head2 from_mail
+=head2 from_mail, from_rss20
 
 takes a RFC2822 compliant datetime string used by email, and returns a DateTime object.
 
@@ -337,7 +355,7 @@ takes a strptime format string and a datetime string, and returns a DateTime obj
 
 may or may not take a DateTime object (or arguments for a DateTime constructor), and returns a W3CDTF datetime string.
 
-=head2 for_mail
+=head2 for_mail, for_rss20
 
 the same as above but returns a RFC2822 datetime string.
 
