@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use DateTime;
 use DateTime::Locale;
@@ -13,6 +13,7 @@ use DateTime::Format::Strptime;
 use DateTime::Format::Mail;
 use DateTime::Format::W3CDTF;
 use DateTime::Format::MySQL;
+use DateTime::Format::HTTP;
 use Scalar::Util qw( blessed );
 
 sub _parse_options {
@@ -39,6 +40,7 @@ sub new {
       mail  => DateTime::Format::Mail->new( loose => 1 ),
       wwwc  => DateTime::Format::W3CDTF->new,
       mysql => DateTime::Format::MySQL->new,
+      http  => 'DateTime::Format::HTTP',  # ::HTTP has no 'new'
     },
     parser => {},
   }, $class;
@@ -63,7 +65,8 @@ sub format {
       }
       eval "require $package;";
       croak $@ if $@;
-      $self->{format}->{lc $name} = $package->new;
+      $self->{format}->{lc $name} =
+        ( $package->can('new') ) ? $package->new : $package;
     }
   }
   $self->{format}->{lc $name};
@@ -136,6 +139,7 @@ sub from_epoch {
 sub from_rss   { shift->parse_as( wwwc  => @_ ); }
 sub from_mail  { shift->parse_as( mail  => @_ ); }
 sub from_mysql { shift->parse_as( mysql => @_ ); }
+sub from_http  { shift->parse_as( http  => @_ ); }
 
 *from_wwwc  = \&from_rss;
 *from_rss20 = \&from_mail;
@@ -184,6 +188,7 @@ sub parse {
 sub for_rss   { shift->render_as( wwwc  => @_ ); }
 sub for_mail  { shift->render_as( mail  => @_ ); }
 sub for_mysql { shift->render_as( mysql => @_ ); }
+sub for_http  { shift->render_as( http  => @_ ); }
 
 *for_wwwc  = \&for_rss;
 *for_rss20 = \&for_mail;
@@ -282,8 +287,8 @@ DateTimeX::Web - DateTime factory for web apps
   # of course you may need to parse with strptime.
   my $obj = $dtx->parse('%Y-%m-%d', $string);
 
-  # you may want to create a datetime string for RSS.
-  my $str = $dtx->for_rss;
+  # you may want to create a datetime string for HTTP headers.
+  my $str = $dtx->for_http;
 
   # or for emails (you can pass an arbitrary DateTime object).
   my $str = $dtx->for_mail($dt);
@@ -341,6 +346,10 @@ takes a RFC2822 compliant datetime string used by email, and returns a DateTime 
 
 takes a MySQL datetime string, and returns a DateTime object. 
 
+=head2 from_http
+
+takes a HTTP datetime string, and returns a DateTime object. 
+
 =head2 parse_as
 
 takes a name of DateTime::Format plugin and some arguments for it, and returns a DateTime object.
@@ -363,13 +372,17 @@ the same as above but returns a RFC2822 datetime string.
 
 the same as above but returns a MySQL datetime string.
 
+=head2 for_http
+
+the same as above but returns a HTTP datetime string.
+
 =head2 render_as
 
 takes a name of DateTime::Format plugin and the same thing(s) as above, and returns a formatted string.
 
 =head1 SEE ALSO
 
-L<DateTime>, L<DateTime::Format::Mail>, L<DateTime::Format::MySQL>, L<DateTime::Format::W3CDFT>, L<DateTime::Format::Strptime>, L<DateTime::TimeZone>, L<DateTime::Locale>
+L<DateTime>, L<DateTime::Format::Mail>, L<DateTime::Format::MySQL>, L<DateTime::Format::W3CDFT>, L<DateTime::Format::HTTP>, L<DateTime::Format::Strptime>, L<DateTime::TimeZone>, L<DateTime::Locale>
 
 =head1 AUTHOR
 

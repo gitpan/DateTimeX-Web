@@ -1,5 +1,9 @@
 Revision history for DateTimeX-Web
 
+0.04 2008/08/17
+  - added (from|for)_http
+  - support formats without 'new'
+
 0.03 2008/07/09
   - added (from|for)_rss20 as an alias for (from|for)_mail
   - a bit more robust isa handling

@@ -9,6 +9,7 @@ WriteMakefile(
   ABSTRACT_FROM => 'lib/DateTimeX/Web.pm',
   PREREQ_PM => {
     'DateTime'                   => 0,
+    'DateTime::Format::HTTP'     => 0,
     'DateTime::Format::Mail'     => 0,
     'DateTime::Format::MySQL'    => 0,
     'DateTime::Format::W3CDTF'   => 0,

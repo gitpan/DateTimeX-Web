@@ -38,3 +38,11 @@ my $mysql_datetime = "2000-05-06 15:23:44";
   my $dt = $dtx->from_mail( $mysql_datetime );
   ok defined $dt;
 }
+
+{ # DateTime::Format::HTTP has no new
+  my $dtx = DateTimeX::Web->new( on_error => 'ignore' );
+  my $dt;
+  eval { $dt = $dtx->format( http => 'HTTP' ); };
+  ok !$@;
+  ok defined $dt;
+}
